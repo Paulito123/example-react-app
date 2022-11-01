@@ -1,10 +1,10 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
-import { Navigate } from 'react-router-dom';
+import React from "react";
+import PropTypes from "prop-types";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import { Navigate } from "react-router-dom";
 
-import './form.css';
+import "./form.css";
 
 const LoginForm = (props) => {
   if (props.isAuthenticated()) {
@@ -13,11 +13,12 @@ const LoginForm = (props) => {
   return (
     <div>
       <h1 className="title is-1">Log In</h1>
-      <hr /><br />
+      <hr />
+      <br />
       <Formik
         initialValues={{
-          email: '',
-          password: '',
+          email: "",
+          password: "",
         }}
         onSubmit={(values, { setSubmitting, resetForm }) => {
           props.handleLoginFormSubmit(values);
@@ -26,13 +27,12 @@ const LoginForm = (props) => {
         }}
         validationSchema={Yup.object().shape({
           email: Yup.string()
-            .email('Enter a valid email.')
-            .required('Email is required.'),
-          password: Yup.string()
-            .required('Password is required.'),
+            .email("Enter a valid email.")
+            .required("Email is required."),
+          password: Yup.string().required("Password is required."),
         })}
       >
-        {props => {
+        {(props) => {
           const {
             values,
             touched,
@@ -45,15 +45,14 @@ const LoginForm = (props) => {
           return (
             <form onSubmit={handleSubmit}>
               <div className="field">
-                <label
-                  className="label"
-                  htmlFor="input-email"
-                >Email</label>
+                <label className="label" htmlFor="input-email">
+                  Email
+                </label>
                 <input
                   name="email"
                   id="input-email"
                   className={
-                    errors.email && touched.email ? 'input error' : 'input'
+                    errors.email && touched.email ? "input error" : "input"
                   }
                   type="email"
                   placeholder="Enter an email address"
@@ -66,15 +65,16 @@ const LoginForm = (props) => {
                 )}
               </div>
               <div className="field">
-                <label
-                  className="label"
-                  htmlFor="input-password"
-                >Password</label>
+                <label className="label" htmlFor="input-password">
+                  Password
+                </label>
                 <input
                   name="password"
                   id="input-password"
                   className={
-                    errors.password && touched.password ? 'input error' : 'input'
+                    errors.password && touched.password
+                      ? "input error"
+                      : "input"
                   }
                   type="password"
                   placeholder="Enter a password"
@@ -97,8 +97,8 @@ const LoginForm = (props) => {
         }}
       </Formik>
     </div>
-  )
-}
+  );
+};
 
 LoginForm.propTypes = {
   handleLoginFormSubmit: PropTypes.func.isRequired,

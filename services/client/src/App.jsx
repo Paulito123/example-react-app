@@ -16,64 +16,64 @@ class App extends Component {
     this.state = {
       users: [],
       title: "A moeder",
-      accessToken: null
+      accessToken: null,
     };
-
-    this.addUser = this.addUser.bind(this);
-    this.handleRegisterFormSubmit = this.handleRegisterFormSubmit.bind(this);
-    this.handleLoginFormSubmit = this.handleLoginFormSubmit.bind(this);
-    this.isAuthenticated = this.isAuthenticated.bind(this);
-    this.logoutUser = this.logoutUser.bind(this);
   }
 
   componentDidMount() {
     this.getUsers();
   }
 
-  addUser(data) {
+  addUser = (data) => {
     axios
       .post(`${process.env.REACT_APP_API_SERVICE_URL}/users`, data)
-      .then(res => {
+      .then((res) => {
         this.getUsers();
         this.setState({ username: "", email: "" });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
-  }
+  };
 
   getUsers() {
     axios
       .get(`${process.env.REACT_APP_API_SERVICE_URL}/users`)
-      .then(res => {
+      .then((res) => {
         this.setState({ users: res.data });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
   }
 
-  handleRegisterFormSubmit(data) {
-    const url = `${process.env.REACT_APP_API_SERVICE_URL}/auth/register`
-    axios.post(url, data)
-    .then((res) => {
-      console.log(res.data);
-    })
-    .catch((err) => { console.log(err); });
+  handleRegisterFormSubmit = (data) => {
+    const url = `${process.env.REACT_APP_API_SERVICE_URL}/auth/register`;
+    axios
+      .post(url, data)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
-  handleLoginFormSubmit(data) {
-    const url = `${process.env.REACT_APP_API_SERVICE_URL}/auth/login`
-    axios.post(url, data)
-    .then((res) => {
-      this.setState({ accessToken: res.data.access_token });
-      this.getUsers();
-      window.localStorage.setItem('refreshToken', res.data.refresh_token);
-    })
-    .catch((err) => { console.log(err); });
+  handleLoginFormSubmit = (data) => {
+    const url = `${process.env.REACT_APP_API_SERVICE_URL}/auth/login`;
+    axios
+      .post(url, data)
+      .then((res) => {
+        this.setState({ accessToken: res.data.access_token });
+        this.getUsers();
+        window.localStorage.setItem("refreshToken", res.data.refresh_token);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
-  isAuthenticated() {
+  isAuthenticated = () => {
     if (this.state.accessToken || this.validRefresh()) {
       return true;
     }
@@ -81,37 +81,34 @@ class App extends Component {
   };
 
   validRefresh() {
-    const token = window.localStorage.getItem('refreshToken');
+    const token = window.localStorage.getItem("refreshToken");
     if (token) {
       axios
-      .post(`${process.env.REACT_APP_API_SERVICE_URL}/auth/refresh`, {
-        refresh_token: token
-      })
-      .then(res => {
-        this.setState({ accessToken: res.data.access_token });
-        this.getUsers();
-        window.localStorage.setItem('refreshToken', res.data.refresh_token);
-        return true;
-      })
-      .catch(err => {
-        return false;
-      });
+        .post(`${process.env.REACT_APP_API_SERVICE_URL}/auth/refresh`, {
+          refresh_token: token,
+        })
+        .then((res) => {
+          this.setState({ accessToken: res.data.access_token });
+          this.getUsers();
+          window.localStorage.setItem("refreshToken", res.data.refresh_token);
+          return true;
+        })
+        .catch((err) => {
+          return false;
+        });
     }
     return false;
-  };
+  }
 
-  logoutUser() {
-    window.localStorage.removeItem('refreshToken');
+  logoutUser = () => {
+    window.localStorage.removeItem("refreshToken");
     this.setState({ accessToken: null });
   };
 
   render() {
     return (
       <div>
-        <NavBar
-          title={this.state.title}
-          logoutUser={this.logoutUser}
-        />
+        <NavBar title={this.state.title} logoutUser={this.logoutUser} />
         <section className="section">
           <div className="container">
             <div className="columns">

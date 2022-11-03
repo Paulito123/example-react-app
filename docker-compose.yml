@@ -16,7 +16,6 @@ services:
       - APP_SETTINGS=src.config.DevelopmentConfig
       - DATABASE_URL=postgresql://postgres:postgres@api-db:5432/api_dev
       - DATABASE_TEST_URL=postgresql://postgres:postgres@api-db:5432/api_test
-      - CHOKIDAR_USEPOLLING=true
     depends_on:
       - api-db
 
@@ -29,7 +28,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-  
+
   client:
     stdin_open: true
     build:
@@ -45,4 +44,3 @@ services:
       - REACT_APP_API_SERVICE_URL=${REACT_APP_API_SERVICE_URL}
     depends_on:
       - api
-      

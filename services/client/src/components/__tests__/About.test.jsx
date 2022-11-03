@@ -9,3 +9,8 @@ it("renders properly", () => {
   const { getByText } = render(<About />);
   expect(getByText("Add something relevant here.")).toHaveClass("content");
 });
+
+it("renders", () => {
+  const { asFragment } = render(<About />);
+  expect(asFragment()).toMatchSnapshot();
+});

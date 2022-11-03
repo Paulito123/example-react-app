@@ -1,5 +1,5 @@
 import React from "react";
-import { cleanup } from "@testing-library/react"; // updated
+import { cleanup } from "@testing-library/react";
 import axios from "axios";
 import { act } from "react-dom/test-utils";
 
@@ -9,7 +9,6 @@ afterEach(cleanup);
 
 jest.mock("axios");
 
-// new
 const props = {
   isAuthenticated: () => {
     return true;
@@ -25,7 +24,7 @@ it("renders properly when authenticated", async () => {
 
   const { container, findByTestId } = renderWithRouter(
     <UserStatus {...props} />
-  ); // updated
+  );
   await act(async () => {
     expect(axios).toHaveBeenCalledTimes(1);
   });
@@ -40,7 +39,7 @@ it("renders", async () => {
     })
   );
 
-  const { asFragment } = renderWithRouter(<UserStatus {...props} />); // updated
+  const { asFragment } = renderWithRouter(<UserStatus {...props} />);
   await act(async () => {
     expect(axios).toHaveBeenCalled();
   });

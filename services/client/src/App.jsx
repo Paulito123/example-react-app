@@ -1,15 +1,29 @@
 import React, { Component } from "react";
 import axios from "axios";
 import { Route, Routes } from "react-router-dom";
+import Modal from "react-modal";
 
-import UsersList from "./components/UsersList";
-import AddUser from "./components/AddUser";
 import About from "./components/About";
-import NavBar from "./components/NavBar";
+import AddUser from "./components/AddUser";
 import LoginForm from "./components/LoginForm";
-import RegisterForm from "./components/RegisterForm";
-import UserStatus from "./components/UserStatus";
 import Message from "./components/Message";
+import NavBar from "./components/NavBar";
+import RegisterForm from "./components/RegisterForm";
+import UsersList from "./components/UsersList";
+import UserStatus from "./components/UserStatus";
+
+const modalStyles = {
+  content: {
+    top: "0",
+    left: "0",
+    right: "0",
+    bottom: "0",
+    border: 0,
+    background: "transparent",
+  },
+};
+
+Modal.setAppElement(document.getElementById("root"));
 
 class App extends Component {
   constructor() {
@@ -17,10 +31,11 @@ class App extends Component {
 
     this.state = {
       users: [],
-      title: "A moeder",
+      title: "TestDriven.io",
       accessToken: null,
       messageType: null,
       messageText: null,
+      showModal: false,
     };
   }
 
@@ -34,15 +49,27 @@ class App extends Component {
       .then((res) => {
         this.getUsers();
         this.setState({ username: "", email: "" });
+        this.handleCloseModal();
         this.createMessage("success", "User added.");
       })
       .catch((err) => {
         console.log(err);
+        this.handleCloseModal();
         this.createMessage("danger", "That user already exists.");
       });
   };
 
-  getUsers() {
+  createMessage = (type, text) => {
+    this.setState({
+      messageType: type,
+      messageText: text,
+    });
+    setTimeout(() => {
+      this.removeMessage();
+    }, 3000);
+  };
+
+  getUsers = () => {
     axios
       .get(`${process.env.REACT_APP_API_SERVICE_URL}/users`)
       .then((res) => {
@@ -51,20 +78,10 @@ class App extends Component {
       .catch((err) => {
         console.log(err);
       });
-  }
+  };
 
-  handleRegisterFormSubmit = (data) => {
-    const url = `${process.env.REACT_APP_API_SERVICE_URL}/auth/register`;
-    axios
-      .post(url, data)
-      .then((res) => {
-        console.log(res.data);
-        this.createMessage("success", "You have registered successfully.");
-      })
-      .catch((err) => {
-        console.log(err);
-        this.createMessage("danger", "That user already exists.");
-      });
+  handleCloseModal = () => {
+    this.setState({ showModal: false });
   };
 
   handleLoginFormSubmit = (data) => {
@@ -83,6 +100,24 @@ class App extends Component {
       });
   };
 
+  handleOpenModal = () => {
+    this.setState({ showModal: true });
+  };
+
+  handleRegisterFormSubmit = (data) => {
+    const url = `${process.env.REACT_APP_API_SERVICE_URL}/auth/register`;
+    axios
+      .post(url, data)
+      .then((res) => {
+        console.log(res.data);
+        this.createMessage("success", "You have registered successfully.");
+      })
+      .catch((err) => {
+        console.log(err);
+        this.createMessage("danger", "That user already exists.");
+      });
+  };
+
   isAuthenticated = () => {
     if (this.state.accessToken || this.validRefresh()) {
       return true;
@@ -90,7 +125,33 @@ class App extends Component {
     return false;
   };
 
-  validRefresh() {
+  logoutUser = () => {
+    window.localStorage.removeItem("refreshToken");
+    this.setState({ accessToken: null });
+    this.createMessage("success", "You have logged out.");
+  };
+
+  removeMessage = () => {
+    this.setState({
+      messageType: null,
+      messageText: null,
+    });
+  };
+
+  removeUser = (user_id) => {
+    axios
+      .delete(`${process.env.REACT_APP_API_SERVICE_URL}/users/${user_id}`)
+      .then((res) => {
+        this.getUsers();
+        this.createMessage("success", "User removed.");
+      })
+      .catch((err) => {
+        console.log(err);
+        this.createMessage("danger", "Something went wrong.");
+      });
+  };
+
+  validRefresh = () => {
     const token = window.localStorage.getItem("refreshToken");
     if (token) {
       axios
@@ -108,29 +169,6 @@ class App extends Component {
         });
     }
     return false;
-  }
-
-  createMessage = (type, text) => {
-    this.setState({
-      messageType: type,
-      messageText: text,
-    });
-    setTimeout(() => {
-      this.removeMessage();
-    }, 3000);
-  };
-
-  removeMessage = () => {
-    this.setState({
-      messageType: null,
-      messageText: null,
-    });
-  };
-
-  logoutUser = () => {
-    window.localStorage.removeItem("refreshToken");
-    this.setState({ accessToken: null });
-    this.createMessage("success", "You have logged out.");
   };
 
   render() {
@@ -162,16 +200,42 @@ class App extends Component {
                         <h1 className="title is-1">Users</h1>
                         <hr />
                         <br />
-                        <AddUser
-                          username={this.state.username}
-                          email={this.state.email}
-                          addUser={this.addUser}
-                          // eslint-disable-next-line react/jsx-handler-names
-                          handleChange={this.handleChange}
+                        {this.isAuthenticated() && (
+                          <button
+                            onClick={this.handleOpenModal}
+                            className="button is-primary"
+                          >
+                            Add User
+                          </button>
+                        )}
+                        <br />
+                        <br />
+                        <Modal
+                          isOpen={this.state.showModal}
+                          style={modalStyles}
+                        >
+                          <div className="modal is-active">
+                            <div className="modal-background" />
+                            <div className="modal-card">
+                              <header className="modal-card-head">
+                                <p className="modal-card-title">Add User</p>
+                                <button
+                                  className="delete"
+                                  aria-label="close"
+                                  onClick={this.handleCloseModal}
+                                />
+                              </header>
+                              <section className="modal-card-body">
+                                <AddUser addUser={this.addUser} />
+                              </section>
+                            </div>
+                          </div>
+                        </Modal>
+                        <UsersList
+                          users={this.state.users}
+                          removeUser={this.removeUser}
+                          isAuthenticated={this.isAuthenticated}
                         />
-                        <br />
-                        <br />
-                        <UsersList users={this.state.users} />
                       </div>
                     }
                   />

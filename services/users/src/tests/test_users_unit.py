@@ -28,7 +28,7 @@ def test_add_user(test_app, monkeypatch):
             {
                 "username": "michael",
                 "email": "michael@testdriven.io",
-                "password": "this..is..TEST!",
+                "password": "greaterthaneight",
             }
         ),
         content_type="application/json",
@@ -80,7 +80,7 @@ def test_add_user_duplicate_email(test_app, monkeypatch):
             {
                 "username": "michael",
                 "email": "michael@testdriven.io",
-                "password": "this..is..TEST!",
+                "password": "greaterthaneight",
             }
         ),
         content_type="application/json",
@@ -218,13 +218,7 @@ def test_update_user(test_app, monkeypatch):
     client = test_app.test_client()
     resp_one = client.put(
         "/users/1",
-        data=json.dumps(
-            {
-                "username": "me",
-                "email": "me@testdriven.io",
-                "password": "this..is..TEST!",
-            }
-        ),
+        data=json.dumps({"username": "me", "email": "me@testdriven.io"}),
         content_type="application/json",
     )
     data = json.loads(resp_one.data.decode())
@@ -296,13 +290,7 @@ def test_update_user_duplicate_email(test_app, monkeypatch):
     client = test_app.test_client()
     resp = client.put(
         "/users/1",
-        data=json.dumps(
-            {
-                "username": "me",
-                "email": "me@testdriven.io",
-                "password": "this..is..TEST!",
-            }
-        ),
+        data=json.dumps({"username": "me", "email": "me@testdriven.io"}),
         content_type="application/json",
     )
     data = json.loads(resp.data.decode())

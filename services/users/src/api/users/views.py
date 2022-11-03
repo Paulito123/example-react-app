@@ -23,7 +23,6 @@ user = users_namespace.model(
     },
 )
 
-
 user_post = users_namespace.inherit(
     "User post", user, {"password": fields.String(required=True)}
 )
@@ -105,25 +104,6 @@ class Users(Resource):
 
         response_object["message"] = f"{user.email} was removed!"
         return response_object, 200
-
-    @users_namespace.expect(user, validate=True)
-    @users_namespace.response(201, "<user_email> was added!")
-    @users_namespace.response(400, "Sorry. That email already exists.")
-    def post(self):
-        """Creates a new user."""
-        post_data = request.get_json()
-        username = post_data.get("username")
-        email = post_data.get("email")
-        response_object = {}
-
-        user = get_user_by_email(email)
-        if user:
-            response_object["message"] = "Sorry. That email already exists."
-            return response_object, 400
-
-        add_user(username, email)
-        response_object["message"] = f"{email} was added!"
-        return response_object, 201
 
 
 users_namespace.add_resource(UsersList, "")
